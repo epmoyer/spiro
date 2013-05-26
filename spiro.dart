@@ -1,28 +1,44 @@
+//-----------------------------------------------------------------------------
+// Copyright (c) 2013, Eric Moyer.
+//
+// Distributed under the terms of the Modified BSD License.
+//
+// The full license is in the file COPYING.txt, distributed with this software.
+//-----------------------------------------------------------------------------
+// Source code: https://github.com/epmoyer/spiro
+// Web demo:    http://www.lemoncrab.com/spiro
+//-----------------------------------------------------------------------------
+
 import 'dart:html';
 import 'dart:math';
 
 num fpsAverage;
 var spirograph;
+bool show_fps = false; // Enable to show FPS when running
 
 void main() {  
   spirograph = new Spirograph(query("#container"));
   spirograph.start();
-  //sprioEngine.start();
 }
 
-/**
- * Display the animation's FPS in a div.
- */
+//-------------------------------------------
+// Show animation FPS (frames per second)
+//-------------------------------------------
 void showFps(num fps) {
-  if (fpsAverage == null) {
-    fpsAverage = fps;
+  if (show_fps){
+    if (fpsAverage == null) {
+      fpsAverage = fps;
+    }
+  
+    fpsAverage = fps * 0.05 + fpsAverage * 0.95;
+  
+    query("#notes").text = "${fpsAverage.round().toInt()} fps";
   }
-
-  fpsAverage = fps * 0.05 + fpsAverage * 0.95;
-
-  query("#notes").text = "${fpsAverage.round().toInt()} fps";
 }
 
+//-------------------------------------------
+// Spirograph class
+//-------------------------------------------
 class Spirograph {
   int num_wheels = 3;
   var wheels_1 = [];
@@ -101,34 +117,38 @@ class Spirograph {
     }
   }
   
+  //-------------------------------------------
+  // interpolate
+  //   Given two wheel lists (effectively, the coefficients for two different
+  //   spirographs) and an interpolation slew factor (between zero and one), 
+  //   generates an interpolated wheel list (effectively, the 
+  //   coefficents representing a spirograph that is 'slew' distant between
+  //   the first and the second).
+  //-------------------------------------------
   void interpolate(var wheel_list_1, var wheel_list_2, var interpolated_wheel_list, double slew){
     for(int i=0; i<num_wheels; i++){
+      // Interpolate radius
       var r1 = wheel_list_1[i].radius;
       var r2 = wheel_list_2[i].radius;
       interpolated_wheel_list[i].radius = r1 + (r2 - r1)*slew;
 
+      // Interpolate speed factor
       var sf1 = wheel_list_1[i].speed_factor;
       var sf2 = wheel_list_2[i].speed_factor;
       interpolated_wheel_list[i].speed_factor = sf1 + (sf2 - sf1)*slew;
     }
   }
 
+  //-------------------------------------------
+  // Render the spirograh
+  //-------------------------------------------
   void render(){
     var context = this.canvas.context2D;
+    
     // Clear the background
-    context.fillStyle = 'blue';
-    context.strokeStyle = 'blue';
     context.clearRect(0, 0, width, height);
     
     Point center = new Point(width/2, height/2);
-    
-    // Draw a circle at center
-    /*
-    context.beginPath();
-    context.arc(center.x, center.y, 5, 0, PI * 2, true);
-    context.closePath();
-    context.fill();
-    */
     
     // Draw spirograph
     bool first_point = true;
@@ -151,6 +171,9 @@ class Spirograph {
         temp_x += cos(angle * wheel.speed_factor) * wheel.radius;
         temp_y += sin(angle * wheel.speed_factor) * wheel.radius;
       }
+      
+      // Rotate the figure about the orign, and translate it to the
+      // center.
       double s = sin(rotation);
       double c = cos(rotation);
       cur_x = (temp_x * c) - (temp_y * s) + center.x;
@@ -167,12 +190,15 @@ class Spirograph {
       }
       first_point = false;
     }
-    rotation += PI/3000.0;
     
-    //print('render()');
+    // Slowly rotate the figure
+    rotation += PI/3000.0;
   }
 }
 
+//-------------------------------------------
+// Wheel class
+//-------------------------------------------
 class Wheel {
   double radius;
   double speed_factor;

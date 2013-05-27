@@ -47,10 +47,10 @@ class Spirograph {
   CanvasElement canvas;
   num _width;
   num _height;
-  num renderTime;
-  double slew = 0.00;
+  num refreshTime;
+  num slew = 0.00;
   bool slew_increasing = true;
-  double rotation = 0.0;
+  num rotation = 0.0;
   
   num get width => _width;
   num get height => _height;
@@ -79,12 +79,14 @@ class Spirograph {
   }
   
   void draw(num _) {
+    num elapsed_seconds;
     num time = new DateTime.now().millisecondsSinceEpoch;
 
-    if (renderTime != null) {
-      showFps((1000 / (time - renderTime)).round());
+    if (refreshTime != null) {
+      elapsed_seconds = 1000 / (time - refreshTime);
+      showFps(elapsed_seconds.round());
     }
-    renderTime = time;
+    refreshTime = time;
     
     if(slew_increasing){
       slew += 0.002;
@@ -103,6 +105,8 @@ class Spirograph {
     interpolate(wheels_1, wheels_2, wheels_interpolate, (cos(slew*PI)+1.0)/2.0);
 
     render();
+    time = new DateTime.now().millisecondsSinceEpoch;
+    query("#notes").text += ", ${(time - refreshTime)} msec render";
     requestRedraw();
   }
   
@@ -125,7 +129,7 @@ class Spirograph {
   //   coefficents representing a spirograph that is 'slew' distant between
   //   the first and the second).
   //-------------------------------------------
-  void interpolate(var wheel_list_1, var wheel_list_2, var interpolated_wheel_list, double slew){
+  void interpolate(var wheel_list_1, var wheel_list_2, var interpolated_wheel_list, num slew){
     for(int i=0; i<num_wheels; i++){
       // Interpolate radius
       var r1 = wheel_list_1[i].radius;
@@ -152,16 +156,18 @@ class Spirograph {
     
     // Draw spirograph
     bool first_point = true;
-    double prev_x = 0.0;
-    double prev_y = 0.0;
-    double temp_x = 0.0;
-    double temp_y = 0.0;
-    double cur_x = 0.0;
-    double cur_y = 0.0;
-    double step = PI/400.0;
+    num prev_x = 0.0;
+    num prev_y = 0.0;
+    num temp_x = 0.0;
+    num temp_y = 0.0;
+    num cur_x = 0.0;
+    num cur_y = 0.0;
+    num step = PI/400.0;
     
-    context.lineWidth = 3.0;
-    for(double angle=0.0; angle<=2.0*PI + 2.0*step; angle+=PI/400.0){
+    context.lineWidth = 3;
+    //context.lineCap = 'square';
+    //context.beginPath();
+    for(num angle=0.0; angle<=2.0*PI + 2.0*step; angle+=PI/400.0){
       prev_x = cur_x;
       prev_y = cur_y;
       temp_x = 0.0;
@@ -174,13 +180,16 @@ class Spirograph {
       
       // Rotate the figure about the orign, and translate it to the
       // center.
-      double s = sin(rotation);
-      double c = cos(rotation);
+      num s = sin(rotation);
+      num c = cos(rotation);
       cur_x = (temp_x * c) - (temp_y * s) + center.x;
       cur_y = (temp_x * s) + (temp_y * c) + center.y;
       
-      if (!first_point) {
-        double color_factor = angle/(2.0*PI);
+      if (first_point) {
+        //context.moveTo(cur_x, cur_y);
+      }
+      else{
+        num color_factor = angle/(2.0*PI);
         context
           ..strokeStyle = 'rgb(64,'+ (255*(1.0-color_factor)).floor().toString() + ',' + (255*color_factor).floor().toString() + ')'
           ..beginPath()
@@ -190,6 +199,7 @@ class Spirograph {
       }
       first_point = false;
     }
+    //context.stroke();
     
     // Slowly rotate the figure
     rotation += PI/3000.0;
@@ -200,8 +210,8 @@ class Spirograph {
 // Wheel class
 //-------------------------------------------
 class Wheel {
-  double radius;
-  double speed_factor;
+  num radius;
+  num speed_factor;
   
   void randomize(){
     Random random = new Random();

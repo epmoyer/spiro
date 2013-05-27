@@ -2673,14 +2673,14 @@ $$.DateTime = {"": "Object;millisecondsSinceEpoch,isUtc",
   get$millisecond: function() {
     return $.Primitives_getMilliseconds(this);
   },
-  DateTime$_now$0: function() {
-    $.Primitives_lazyAsJsDate(this);
-  },
   DateTime$fromMillisecondsSinceEpoch$2$isUtc: function(millisecondsSinceEpoch, isUtc) {
     if ($.abs$0$n(millisecondsSinceEpoch) > 8640000000000000)
       throw $.wrapException($.ArgumentError$(millisecondsSinceEpoch));
     if (isUtc == null)
       throw $.wrapException($.ArgumentError$(isUtc));
+  },
+  DateTime$_now$0: function() {
+    $.Primitives_lazyAsJsDate(this);
   },
   $isDateTime: true
 };
@@ -3501,6 +3501,9 @@ $$.Spirograph = {"": "Object;num_wheels,wheels_1,wheels_2,wheels_interpolate,can
     t1 = this.slew * 3.141592653589793;
     this.interpolate$4(this.wheels_1, this.wheels_2, this.wheels_interpolate, (Math.cos(t1) + 1) / 2);
     this.render$0();
+    t1 = $.DateTime$_now();
+    t2 = document.querySelector("#notes");
+    t2.textContent = $.$add$ns(t2.textContent, ", " + $.S($.$sub$n(t1.millisecondsSinceEpoch, this.renderTime)) + " msec render");
     $.Window_methods.requestAnimationFrame$1(window, this.get$draw());
   },
   get$draw: function() {
@@ -3572,7 +3575,9 @@ $$.Spirograph = {"": "Object;num_wheels,wheels_1,wheels_2,wheels_interpolate,can
       if (typeof t2 !== "number")
         throw $.iae(t2);
       cur_y0 = temp_x * s + temp_y * c + t2;
-      if (!first_point) {
+      if (first_point)
+        ;
+      else {
         color_factor = angle / 6.283185307179586;
         context.strokeStyle = $.JSString_methods.$add($.JSString_methods.$add($.JSString_methods.$add($.JSString_methods.$add("rgb(64,", $.JSNumber_methods.toString$0($.JSNumber_methods.floor$0(255 * (1 - color_factor)))), ","), $.JSNumber_methods.toString$0($.JSNumber_methods.floor$0(255 * color_factor))), ")");
         context.beginPath();

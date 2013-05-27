@@ -13,7 +13,8 @@ Overview
 Spiro is an animated spirograph demo written in Dart.  It is my first Dart project and my first client side web app.
 
 Source code: https://github.com/epmoyer/spiro
-Web demo:    http://www.lemoncrab.com/spiro
+
+Web demo:    http://www.lemoncrab.com/spiro/spiro.html
 
 Operation
 =========

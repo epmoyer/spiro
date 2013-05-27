@@ -3465,7 +3465,7 @@ $$._convertDartToNative_PrepareForStructuredClone_walk_anon = {"": "Closure;box_
 
 $$.ReceivePort = {"": "Object;"};
 
-$$.Spirograph = {"": "Object;num_wheels,wheels_1,wheels_2,wheels_interpolate,canvas>,_width@,_height?,renderTime,slew,slew_increasing",
+$$.Spirograph = {"": "Object;num_wheels,wheels_1,wheels_2,wheels_interpolate,canvas>,_width@,_height?,renderTime,slew,slew_increasing,rotation",
   get$width: function(_) {
     return this._width;
   },
@@ -3535,109 +3535,53 @@ $$.Spirograph = {"": "Object;num_wheels,wheels_1,wheels_2,wheels_interpolate,can
     }
   },
   render$0: function() {
-    var context, center, t1, cur_x, cur_y, first_point, cur_x0, cur_y0, angle, t2, cur_y1, cur_x1, wheel, t3, t4, color_factor;
+    var context, center, t1, t2, t3, first_point, cur_x, cur_y, angle, t4, temp_x, temp_y, wheel, t5, t6, s, c, cur_x0, cur_y0, color_factor;
     context = $.get$context2D$x(this.canvas);
-    context.fillStyle = "blue";
-    context.strokeStyle = "blue";
     context.clearRect(0, 0, this.get$width(this), this.get$height(this));
     center = $.Point$($.$div$n(this.get$width(this), 2), $.$div$n(this.get$height(this), 2));
     context.lineWidth = 3;
-    t1 = this.wheels_interpolate;
-    cur_x = center.x;
-    if (typeof cur_x !== "number")
-      return this.render$0$bailout(1, context, center, cur_x, t1);
-    cur_y = center.y;
-    if (typeof cur_y !== "number")
-      return this.render$0$bailout(2, context, 0, cur_x, t1, cur_y);
-    first_point = true;
-    cur_x0 = 0;
-    cur_y0 = 0;
-    angle = 0;
-    for (; angle <= 6.298893270447535; angle += 0.007853981633974483, cur_y0 = cur_y1, cur_x0 = cur_x1, first_point = false) {
-      for (t2 = $.JSArray_methods.get$iterator(t1), cur_y1 = cur_y, cur_x1 = cur_x; t2.moveNext$0();) {
-        wheel = t2.get$current();
-        t3 = wheel.get$speed_factor();
-        if (typeof t3 !== "number")
-          throw $.iae(t3);
-        t3 = angle * t3;
-        t3 = Math.cos(t3);
-        t4 = wheel.get$radius();
-        if (typeof t4 !== "number")
-          throw $.iae(t4);
-        cur_x1 += t3 * t4;
-        t4 = wheel.get$speed_factor();
-        if (typeof t4 !== "number")
-          throw $.iae(t4);
-        t4 = angle * t4;
-        t3 = Math.sin(t4);
-        t4 = wheel.get$radius();
-        if (typeof t4 !== "number")
-          throw $.iae(t4);
-        cur_y1 += t3 * t4;
+    for (t1 = center.x, t2 = center.y, t3 = this.wheels_interpolate, first_point = true, cur_x = 0, cur_y = 0, angle = 0; angle <= 6.298893270447535; angle += 0.007853981633974483, cur_y = cur_y0, cur_x = cur_x0, first_point = false) {
+      for (t4 = $.JSArray_methods.get$iterator(t3), temp_x = 0, temp_y = 0; t4.moveNext$0();) {
+        wheel = t4.get$current();
+        t5 = wheel.get$speed_factor();
+        if (typeof t5 !== "number")
+          throw $.iae(t5);
+        t5 = angle * t5;
+        t5 = Math.cos(t5);
+        t6 = wheel.get$radius();
+        if (typeof t6 !== "number")
+          throw $.iae(t6);
+        temp_x += t5 * t6;
+        t6 = wheel.get$speed_factor();
+        if (typeof t6 !== "number")
+          throw $.iae(t6);
+        t6 = angle * t6;
+        t5 = Math.sin(t6);
+        t6 = wheel.get$radius();
+        if (typeof t6 !== "number")
+          throw $.iae(t6);
+        temp_y += t5 * t6;
       }
+      t4 = this.rotation;
+      s = Math.sin(t4);
+      t4 = this.rotation;
+      c = Math.cos(t4);
+      if (typeof t1 !== "number")
+        throw $.iae(t1);
+      cur_x0 = temp_x * c - temp_y * s + t1;
+      if (typeof t2 !== "number")
+        throw $.iae(t2);
+      cur_y0 = temp_x * s + temp_y * c + t2;
       if (!first_point) {
         color_factor = angle / 6.283185307179586;
         context.strokeStyle = $.JSString_methods.$add($.JSString_methods.$add($.JSString_methods.$add($.JSString_methods.$add("rgb(64,", $.JSNumber_methods.toString$0($.JSNumber_methods.floor$0(255 * (1 - color_factor)))), ","), $.JSNumber_methods.toString$0($.JSNumber_methods.floor$0(255 * color_factor))), ")");
         context.beginPath();
-        context.moveTo(cur_x0, cur_y0);
-        context.lineTo(cur_x1, cur_y1);
+        context.moveTo(cur_x, cur_y);
+        context.lineTo(cur_x0, cur_y0);
         context.stroke();
       }
     }
-  },
-  render$0$bailout: function(state0, context, center, cur_x, t1, cur_y) {
-    switch (state0) {
-      case 0:
-        context = $.get$context2D$x(this.canvas);
-        context.fillStyle = "blue";
-        context.strokeStyle = "blue";
-        context.clearRect(0, 0, this.get$width(this), this.get$height(this));
-        center = $.Point$($.$div$n(this.get$width(this), 2), $.$div$n(this.get$height(this), 2));
-        context.lineWidth = 3;
-        t1 = this.wheels_interpolate;
-        cur_x = center.x;
-      case 1:
-        state0 = 0;
-        cur_y = center.y;
-      case 2:
-        var first_point, cur_x0, cur_y0, angle, t2, cur_y1, cur_x1, wheel, t3, t4, color_factor;
-        state0 = 0;
-        first_point = true;
-        cur_x0 = 0;
-        cur_y0 = 0;
-        angle = 0;
-        for (; angle <= 6.298893270447535; angle += 0.007853981633974483, cur_y0 = cur_y1, cur_x0 = cur_x1, first_point = false) {
-          for (t2 = $.JSArray_methods.get$iterator(t1), cur_y1 = cur_y, cur_x1 = cur_x; t2.moveNext$0();) {
-            wheel = t2.get$current();
-            t3 = wheel.get$speed_factor();
-            if (typeof t3 !== "number")
-              throw $.iae(t3);
-            t3 = angle * t3;
-            t3 = Math.cos(t3);
-            t4 = wheel.get$radius();
-            if (typeof t4 !== "number")
-              throw $.iae(t4);
-            cur_x1 = $.$add$ns(cur_x1, t3 * t4);
-            t4 = wheel.get$speed_factor();
-            if (typeof t4 !== "number")
-              throw $.iae(t4);
-            t4 = angle * t4;
-            t3 = Math.sin(t4);
-            t4 = wheel.get$radius();
-            if (typeof t4 !== "number")
-              throw $.iae(t4);
-            cur_y1 = $.$add$ns(cur_y1, t3 * t4);
-          }
-          if (!first_point) {
-            color_factor = angle / 6.283185307179586;
-            context.strokeStyle = $.JSString_methods.$add($.JSString_methods.$add($.JSString_methods.$add($.JSString_methods.$add("rgb(64,", $.JSNumber_methods.toString$0($.JSNumber_methods.floor$0(255 * (1 - color_factor)))), ","), $.JSNumber_methods.toString$0($.JSNumber_methods.floor$0(255 * color_factor))), ")");
-            context.beginPath();
-            context.moveTo(cur_x0, cur_y0);
-            context.lineTo(cur_x1, cur_y1);
-            context.stroke();
-          }
-        }
-    }
+    this.rotation = this.rotation + 0.0010471975511965976;
   },
   Spirograph$1: function(canvas) {
     var t1, t2, t3, i;
@@ -6159,14 +6103,16 @@ $.main = function() {
 };
 
 $.showFps = function(fps) {
-  if ($.fpsAverage == null)
-    $.fpsAverage = fps;
-  $.fpsAverage = fps * 0.05 + $.$mul$n($.fpsAverage, 0.95);
-  document.querySelector("#notes").textContent = $.S($.JSNumber_methods.toInt$0($.round$0$n($.fpsAverage))) + " fps";
+  if ($.show_fps) {
+    if ($.fpsAverage == null)
+      $.fpsAverage = fps;
+    $.fpsAverage = fps * 0.05 + $.$mul$n($.fpsAverage, 0.95);
+    document.querySelector("#notes").textContent = $.S($.JSNumber_methods.toInt$0($.round$0$n($.fpsAverage))) + " fps";
+  }
 };
 
 $.Spirograph$ = function(canvas) {
-  var t1 = new $.Spirograph(3, [], [], [], canvas, null, null, null, 0, true);
+  var t1 = new $.Spirograph(3, [], [], [], canvas, null, null, null, 0, true, 0);
   t1.Spirograph$1(canvas);
   return t1;
 };
@@ -6238,6 +6184,7 @@ $._pendingMicrotasks = null;
 $._microtaskScheduler = null;
 $.fpsAverage = null;
 $.spirograph = null;
+$.show_fps = true;
 $.$$dom_addEventListener$3$x = function(receiver, a0, a1, a2) {
   return $.getInterceptor$x(receiver).$$dom_addEventListener$3(receiver, a0, a1, a2);
 };

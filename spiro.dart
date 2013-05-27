@@ -6,7 +6,7 @@
 // The full license is in the file COPYING.txt, distributed with this software.
 //-----------------------------------------------------------------------------
 // Source code: https://github.com/epmoyer/spiro
-// Web demo:    http://www.lemoncrab.com/spiro
+// Web demo:    http://www.lemoncrab.com/spiro/spiro.html
 //-----------------------------------------------------------------------------
 
 import 'dart:html';
@@ -14,7 +14,7 @@ import 'dart:math';
 
 num fpsAverage;
 var spirograph;
-bool show_fps = false; // Enable to show FPS when running
+bool show_fps = true; // Enable to show FPS when running
 
 void main() {  
   spirograph = new Spirograph(query("#container"));

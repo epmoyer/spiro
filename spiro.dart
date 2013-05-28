@@ -14,7 +14,7 @@ import 'dart:math';
 
 num fpsAverage;
 var spirograph;
-num max_wheel_radius  = 80.0;
+num max_wheel_radius  = 0.0;
 var version = 'v1.0';
 bool show_fps = true; // Enable to show FPS when running
 
@@ -62,15 +62,6 @@ class Spirograph {
   num get height => _height;
   
   Spirograph(this.canvas){
-    for(int i=0; i<num_wheels; i++){
-      wheels_1.add(new Wheel());
-      wheels_2.add(new Wheel());
-      wheels_interpolate.add(new Wheel());
-      
-      randomize(wheels_1);
-      randomize(wheels_2);
-    }
-    
     // Set canvas size and max wheel radius
     num margin = 130;
     _height = window.innerHeight - margin;
@@ -80,6 +71,15 @@ class Spirograph {
     canvas.height = _height;
     max_wheel_radius = (min(canvas.width, canvas.height)/2)/num_wheels - 10;
    
+    // Create initial wheels
+    for(int i=0; i<num_wheels; i++){
+      wheels_1.add(new Wheel());
+      wheels_2.add(new Wheel());
+      wheels_interpolate.add(new Wheel());
+      
+      randomize(wheels_1);
+      randomize(wheels_2);
+    }
   }
   
   start(){
@@ -195,10 +195,7 @@ class Spirograph {
       cur_x = (temp_x * c) - (temp_y * s) + center.x;
       cur_y = (temp_x * s) + (temp_y * c) + center.y;
       
-      if (first_point) {
-        //context.moveTo(cur_x, cur_y);
-      }
-      else{
+      if (!first_point) {
         num color_factor = angle/(2.0*PI);
         context
           ..strokeStyle = 'rgb(64,'+ (255*(1.0-color_factor)).floor().toString() + ',' + (255*color_factor).floor().toString() + ')'
@@ -216,8 +213,8 @@ class Spirograph {
 // Wheel class
 //-------------------------------------------
 class Wheel {
-  num radius;
-  num speed_factor;
+  num radius=0.0;
+  num speed_factor=1.0;
   
   void randomize(){
     Random random = new Random();

@@ -3465,7 +3465,7 @@ $$._convertDartToNative_PrepareForStructuredClone_walk_anon = {"": "Closure;box_
 
 $$.ReceivePort = {"": "Object;"};
 
-$$.Spirograph = {"": "Object;num_wheels,wheels_1,wheels_2,wheels_interpolate,canvas>,_width@,_height?,renderTime,slew,slew_increasing,rotation",
+$$.Spirograph = {"": "Object;num_wheels,wheels_1,wheels_2,wheels_interpolate,canvas>,_width@,_height?,refreshTime,slew,slew_increasing,rotation,rotation_radians_per_sec,slew_per_sec",
   get$width: function(_) {
     return this._width;
   },
@@ -3473,26 +3473,27 @@ $$.Spirograph = {"": "Object;num_wheels,wheels_1,wheels_2,wheels_interpolate,can
     return this._height;
   },
   draw$1: function(_) {
-    var time, t1, t2;
+    var time, t1, elapsed_seconds, t2, t3;
     time = $.DateTime$_now().millisecondsSinceEpoch;
-    t1 = this.renderTime;
+    t1 = this.refreshTime;
     if (t1 != null) {
-      t1 = $.$sub$n(time, t1);
-      if (typeof t1 !== "number")
-        throw $.iae(t1);
-      $.showFps($.JSDouble_methods.round$0(1000 / t1));
-    }
-    this.renderTime = time;
+      elapsed_seconds = $.$div$n($.$sub$n(time, t1), 1000);
+      $.showFps($.JSDouble_methods.round$0(1 / elapsed_seconds));
+    } else
+      elapsed_seconds = 0.016666666666666666;
+    this.refreshTime = time;
+    this.rotation = this.rotation + elapsed_seconds * this.rotation_radians_per_sec;
     t1 = this.slew_increasing;
     t2 = this.slew;
+    t3 = this.slew_per_sec;
     if (t1) {
-      this.slew = t2 + 0.002;
+      this.slew = t2 + elapsed_seconds * t3;
       if (this.slew >= 1) {
         this.slew_increasing = false;
         this.randomize$1(this.wheels_2);
       }
     } else {
-      this.slew = t2 - 0.002;
+      this.slew = t2 - elapsed_seconds * t3;
       if (this.slew <= 0) {
         this.slew_increasing = true;
         this.randomize$1(this.wheels_1);
@@ -3503,7 +3504,7 @@ $$.Spirograph = {"": "Object;num_wheels,wheels_1,wheels_2,wheels_interpolate,can
     this.render$0();
     t1 = $.DateTime$_now();
     t2 = document.querySelector("#notes");
-    t2.textContent = $.$add$ns(t2.textContent, ", " + $.S($.$sub$n(t1.millisecondsSinceEpoch, this.renderTime)) + " msec render");
+    t2.textContent = $.$add$ns(t2.textContent, ", " + $.S($.$sub$n(t1.millisecondsSinceEpoch, this.refreshTime)) + " msec render");
     $.Window_methods.requestAnimationFrame$1(window, this.get$draw());
   },
   get$draw: function() {
@@ -3586,7 +3587,6 @@ $$.Spirograph = {"": "Object;num_wheels,wheels_1,wheels_2,wheels_interpolate,can
         context.stroke();
       }
     }
-    this.rotation = this.rotation + 0.0010471975511965976;
   },
   Spirograph$1: function(canvas) {
     var t1, t2, t3, i;
@@ -5945,7 +5945,7 @@ $.List_List$from = function(other, growable) {
   list = $.List_List($);
   for (t1 = $.get$iterator$ax(other); t1.moveNext$0() === true;)
     list.push(t1.get$current());
-  if (growable === true)
+  if (growable)
     return list;
   $length = list.length;
   fixedList = $.List_List($length);
@@ -6117,7 +6117,7 @@ $.showFps = function(fps) {
 };
 
 $.Spirograph$ = function(canvas) {
-  var t1 = new $.Spirograph(3, [], [], [], canvas, null, null, null, 0, true, 0);
+  var t1 = new $.Spirograph(3, [], [], [], canvas, null, null, null, 0, true, 0, 0.06283185307179587, 0.12);
   t1.Spirograph$1(canvas);
   return t1;
 };

@@ -52,6 +52,10 @@ class Spirograph {
   bool slew_increasing = true;
   num rotation = 0.0;
   
+  // Slowly rotate the figure
+  num rotation_radians_per_sec = (2 * PI)/100;
+  num slew_per_sec = 0.12;
+  
   num get width => _width;
   num get height => _height;
   
@@ -83,20 +87,24 @@ class Spirograph {
     num time = new DateTime.now().millisecondsSinceEpoch;
 
     if (refreshTime != null) {
-      elapsed_seconds = 1000 / (time - refreshTime);
-      showFps(elapsed_seconds.round());
+      elapsed_seconds = (time - refreshTime) / 1000;
+      showFps((1/elapsed_seconds).round());
+    }else{
+      elapsed_seconds = 1/60;
     }
     refreshTime = time;
     
+    rotation += elapsed_seconds * rotation_radians_per_sec;
+    
     if(slew_increasing){
-      slew += 0.002;
+      slew += elapsed_seconds * slew_per_sec;
       if(slew>=1.0){
         slew_increasing = false;
         randomize(wheels_2);
       }
     }
     else{
-      slew -= 0.002;
+      slew -= elapsed_seconds * slew_per_sec;
       if(slew<=0.0){
         slew_increasing = true;
         randomize(wheels_1);
@@ -201,8 +209,7 @@ class Spirograph {
     }
     //context.stroke();
     
-    // Slowly rotate the figure
-    rotation += PI/3000.0;
+    //rotation += PI/3000.0;
   }
 }
 

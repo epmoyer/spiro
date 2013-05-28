@@ -510,7 +510,7 @@ $$.Spirograph = {"": "Object;num_wheels,wheels_1,wheels_2,wheels_interpolate,can
     var context, center, t1, t2, t3, first_point, cur_x, cur_y, angle, t4, temp_x, temp_y, wheel, t5, t6, s, c, cur_x0, cur_y0, color_factor;
     context = $.get$context2D$x(this.canvas);
     context.clearRect(0, 0, this.get$width(this), this.get$height(this));
-    center = $.Point$($.$div$n(this.get$width(this), 2), $.$div$n(this.get$height(this), 2));
+    center = $.Point$(this.get$width(this) / 2, this.get$height(this) / 2);
     context.lineWidth = 3;
     for (t1 = center.x, t2 = center.y, t3 = this.wheels_interpolate, first_point = true, cur_x = 0, cur_y = 0, angle = 0; angle <= 6.298893270447535; angle += 0.007853981633974483, cur_y = cur_y0, cur_x = cur_x0, first_point = false) {
       for (t4 = $.JSArray_methods.get$iterator(t3), temp_x = 0, temp_y = 0; t4.moveNext$0();) {
@@ -544,9 +544,7 @@ $$.Spirograph = {"": "Object;num_wheels,wheels_1,wheels_2,wheels_interpolate,can
       if (typeof t2 !== "number")
         throw $.iae(t2);
       cur_y0 = temp_x * s + temp_y * c + t2;
-      if (first_point)
-        ;
-      else {
+      if (!first_point) {
         color_factor = angle / 6.283185307179586;
         context.strokeStyle = $.JSString_methods.$add($.JSString_methods.$add($.JSString_methods.$add($.JSString_methods.$add("rgb(64,", $.JSNumber_methods.toString$0($.JSNumber_methods.floor$0(255 * (1 - color_factor)))), ","), $.JSNumber_methods.toString$0($.JSNumber_methods.floor$0(255 * color_factor))), ")");
         context.beginPath();
@@ -557,14 +555,7 @@ $$.Spirograph = {"": "Object;num_wheels,wheels_1,wheels_2,wheels_interpolate,can
     }
   },
   Spirograph$1: function(canvas) {
-    var t1, t2, t3, i, t4;
-    for (t1 = this.wheels_1, t2 = this.wheels_2, t3 = this.wheels_interpolate, i = 0; t4 = this.num_wheels, i < t4; ++i) {
-      t1.push($.Wheel$());
-      t2.push($.Wheel$());
-      t3.push($.Wheel$());
-      this.randomize$1(t1);
-      this.randomize$1(t2);
-    }
+    var t1, t2, t3, t4, i;
     t1 = $.window;
     this._height = $.$sub$n(t1().innerHeight, 130);
     this._width = $.$sub$n(t1().innerWidth, 20);
@@ -572,7 +563,15 @@ $$.Spirograph = {"": "Object;num_wheels,wheels_1,wheels_2,wheels_interpolate,can
     t2 = $.getInterceptor$x(t1);
     t2.set$width(t1, this._width);
     t2.set$height(t1, this._height);
-    $.max_wheel_radius = $.$div$n($.min(t2.get$width(t1), t2.get$height(t1)), 2) / t4 - 10;
+    t3 = this.num_wheels;
+    $.max_wheel_radius = $.$div$n($.min(t2.get$width(t1), t2.get$height(t1)), 2) / t3 - 10;
+    for (t1 = this.wheels_1, t2 = this.wheels_2, t4 = this.wheels_interpolate, i = 0; i < t3; ++i) {
+      t1.push($.Wheel$());
+      t2.push($.Wheel$());
+      t4.push($.Wheel$());
+      this.randomize$1(t1);
+      this.randomize$1(t2);
+    }
   }
 };
 
@@ -1626,7 +1625,7 @@ $.Spirograph$ = function(canvas) {
 };
 
 $.Wheel$ = function() {
-  return new $.Wheel(null, null);
+  return new $.Wheel(0, 1);
 };
 
 $.wrapException.call$1 = $.wrapException;
@@ -1662,7 +1661,7 @@ $.interceptorsByTag = null;
 $.leafTags = null;
 $.fpsAverage = null;
 $.spirograph = null;
-$.max_wheel_radius = 80;
+$.max_wheel_radius = 0;
 $.version = "v1.0";
 $.show_fps = true;
 $.$add$ns = function(receiver, a0) {

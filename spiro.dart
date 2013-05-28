@@ -14,6 +14,8 @@ import 'dart:math';
 
 num fpsAverage;
 var spirograph;
+num max_wheel_radius  = 80.0;
+var version = 'v1.0';
 bool show_fps = true; // Enable to show FPS when running
 
 void main() {  
@@ -32,7 +34,7 @@ void showFps(num fps) {
   
     fpsAverage = fps * 0.05 + fpsAverage * 0.95;
   
-    query("#notes").text = "${fpsAverage.round().toInt()} fps";
+    query("#notes").text = "${version}, ${fpsAverage.round().toInt()} fps";
   }
 }
 
@@ -69,13 +71,15 @@ class Spirograph {
       randomize(wheels_2);
     }
     
-    // Measure the canvas element.
-    window.setImmediate(() {
-      _width = (canvas.parent as Element).client.width;
-      _height = (canvas.parent as Element).client.height;
+    // Set canvas size and max wheel radius
+    num margin = 130;
+    _height = window.innerHeight - margin;
+    _width = window.innerWidth - 20;
 
-      canvas.width = _width;
-    });
+    canvas.width = _width;
+    canvas.height = _height;
+    max_wheel_radius = (min(canvas.width, canvas.height)/2)/num_wheels - 10;
+   
   }
   
   start(){
@@ -173,8 +177,6 @@ class Spirograph {
     num step = PI/400.0;
     
     context.lineWidth = 3;
-    //context.lineCap = 'square';
-    //context.beginPath();
     for(num angle=0.0; angle<=2.0*PI + 2.0*step; angle+=PI/400.0){
       prev_x = cur_x;
       prev_y = cur_y;
@@ -207,9 +209,6 @@ class Spirograph {
       }
       first_point = false;
     }
-    //context.stroke();
-    
-    //rotation += PI/3000.0;
   }
 }
 
@@ -223,7 +222,7 @@ class Wheel {
   void randomize(){
     Random random = new Random();
     
-    radius = 20.0 + 60.0 * random.nextDouble();
+    radius = max_wheel_radius * 0.2 + max_wheel_radius * 0.8 * random.nextDouble();
     speed_factor = random.nextInt(20).toDouble();
   }
 }

@@ -28,7 +28,7 @@ smoothly slews between the two curves using a slew rate that is cosine mapped (s
 and fastest when midway between the two curves).  Once a curve converges, the oposite curve is randomized and the
 process repeats.
 
-The overall curve is slowly rotated so that the end point doesn't always sit in the same place boringly.
+The overall curve is slowly rotated so that the start point doesn't boringly sit in the same place.
 
 
 .. _`Eric Moyer`: mailto:eric@lemoncrab.com 

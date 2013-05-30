@@ -12,11 +12,12 @@
 import 'dart:html';
 import 'dart:math';
 
+var version = 'v1.1';
+bool show_fps = true; // Enable to show FPS when running
 num fpsAverage;
 var spirograph;
 num max_wheel_radius  = 0.0;
-var version = 'v1.0';
-bool show_fps = true; // Enable to show FPS when running
+var speed_factors = [-19, -17, -13, -11, -7, -5, -3, -2, 2, 3, 5, 7, 11, 13, 17, 19];
 
 void main() {  
   spirograph = new Spirograph(query("#container"));
@@ -42,7 +43,7 @@ void showFps(num fps) {
 // Spirograph class
 //-------------------------------------------
 class Spirograph {
-  int num_wheels = 3;
+  int num_wheels = 5;
   var wheels_1 = [];
   var wheels_2 = [];
   var wheels_interpolate = [];
@@ -220,6 +221,6 @@ class Wheel {
     Random random = new Random();
     
     radius = max_wheel_radius * 0.2 + max_wheel_radius * 0.8 * random.nextDouble();
-    speed_factor = random.nextInt(20).toDouble();
+    speed_factor = speed_factors[random.nextInt(speed_factors.length)];
   }
 }

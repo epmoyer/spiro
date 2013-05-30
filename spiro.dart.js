@@ -167,9 +167,6 @@ $$.JSNumber = {"": "num/Interceptor;",
     else
       return Math.round(receiver);
   },
-  toDouble$0: function(receiver) {
-    return receiver;
-  },
   toString$0: function(receiver) {
     if (receiver === 0 && 1 / receiver < 0)
       return "-0.0";
@@ -364,6 +361,12 @@ $$.UnsupportedError = {"": "Object;message",
 $$.ConcurrentModificationError = {"": "Object;modifiedObject",
   toString$0: function(_) {
     return "Concurrent modification during iteration: " + $.Error_safeToString(this.modifiedObject) + ".";
+  }
+};
+
+$$.RuntimeError = {"": "Object;message",
+  toString$0: function(_) {
+    return "RuntimeError: " + this.message;
   }
 };
 
@@ -577,11 +580,17 @@ $$.Spirograph = {"": "Object;num_wheels,wheels_1,wheels_2,wheels_interpolate,can
 
 $$.Wheel = {"": "Object;radius@,speed_factor@",
   randomize$0: function() {
-    var t1, max;
+    var t1, max, t2;
     t1 = $.max_wheel_radius;
     this.radius = t1 * 0.2 + t1 * 0.8 * Math.random();
-    max = 20;
-    this.speed_factor = $.JSInt_methods.toDouble$0(Math.random() * max >>> 0);
+    t1 = $.get$speed_factors();
+    max = $.get$speed_factors().length;
+    if (max > 4294967295)
+      max = 4294967295;
+    t2 = Math.random() * max >>> 0;
+    if (t2 < 0 || t2 >= t1.length)
+      throw $.ioore(t2);
+    this.speed_factor = t1[t2];
   }
 };
 
@@ -1318,6 +1327,10 @@ $.convertDartClosureToJS = function(closure, arity) {
   return $function;
 };
 
+$.throwCyclicInit = function(staticName) {
+  throw $.wrapException($.RuntimeError$("Cyclic initialization for static " + $.S(staticName)));
+};
+
 $.typeNameInChrome = function(obj) {
   return $.typeNameInWebKitCommon(obj.constructor.name);
 };
@@ -1544,6 +1557,10 @@ $.ConcurrentModificationError$ = function(modifiedObject) {
   return new $.ConcurrentModificationError(modifiedObject);
 };
 
+$.RuntimeError$ = function(message) {
+  return new $.RuntimeError(message);
+};
+
 $._ExceptionImplementation$ = function(message) {
   return new $._ExceptionImplementation(message);
 };
@@ -1619,7 +1636,7 @@ $.showFps = function(fps) {
 };
 
 $.Spirograph$ = function(canvas) {
-  var t1 = new $.Spirograph(3, [], [], [], canvas, null, null, null, 0, true, 0, 0.06283185307179587, 0.12);
+  var t1 = new $.Spirograph(5, [], [], [], canvas, null, null, null, 0, true, 0, 0.06283185307179587, 0.12);
   t1.Spirograph$1(canvas);
   return t1;
 };
@@ -1659,11 +1676,11 @@ $.Primitives_hashCodeSeed = 0;
 $._getTypeNameOf = null;
 $.interceptorsByTag = null;
 $.leafTags = null;
+$.version = "v1.1";
+$.show_fps = true;
 $.fpsAverage = null;
 $.spirograph = null;
 $.max_wheel_radius = 0;
-$.version = "v1.0";
-$.show_fps = true;
 $.$add$ns = function(receiver, a0) {
   if (typeof receiver == "number" && typeof a0 == "number")
     return receiver + a0;
@@ -1778,6 +1795,9 @@ $.getInterceptor$x = function(receiver) {
     return $.Interceptor.prototype;
   return $.getNativeInterceptor(receiver);
 };
+Isolate.$lazy($, "speed_factors", "speed_factors", "get$speed_factors", function() {
+  return [-19, -17, -13, -11, -7, -5, -3, -2, 2, 3, 5, 7, 11, 13, 17, 19];
+});
 // Native classes
 $.defineNativeMethodsNonleaf("HTMLElement", $._HTMLElement);
 
@@ -2261,6 +2281,35 @@ function init() {
     }
     for (var cls in pendingClasses)
       finishClass(cls);
+  };
+  Isolate.$lazy = function(prototype, staticName, fieldName, getterName, lazyValue) {
+    var getter = new Function("{ return $." + fieldName + ";}");
+    var sentinelUndefined = {};
+    var sentinelInProgress = {};
+    prototype[fieldName] = sentinelUndefined;
+    prototype[getterName] = function() {
+      var result = $[fieldName];
+      try {
+        if (result === sentinelUndefined) {
+          $[fieldName] = sentinelInProgress;
+          try {
+            result = $[fieldName] = lazyValue();
+          } finally {
+            if (result === sentinelUndefined) {
+              if ($[fieldName] === sentinelInProgress) {
+                $[fieldName] = null;
+              }
+            }
+          }
+        } else {
+          if (result === sentinelInProgress)
+            $.throwCyclicInit(staticName);
+        }
+        return result;
+      } finally {
+        $[getterName] = getter;
+      }
+    };
   };
   Isolate.$finishIsolateConstructor = function(oldIsolate) {
     var isolateProperties = oldIsolate.$isolateProperties;
